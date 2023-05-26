@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
 export default function Categoria() {
-  const [categoryName, setCategoryName] = useState('');
-  const [categories, setCategories] = useState([]);
+  const [nombre, setNombre] = useState('');
+  const [lstCategorias, setLstCategorias] = useState([]);
 
   const agregarCategoria = (event) => {
     event.preventDefault();
 
-    if (categoryName.trim() !== '') {
-      setCategories([...categories, categoryName]);
-      setCategoryName('');
+    if (nombre.trim() !== '') {
+      setLstCategorias([...lstCategorias, nombre]);
+      setNombre('');
     }
   };
 
@@ -23,8 +23,8 @@ export default function Categoria() {
           <input
             type="text"
             placeholder="Nombre de la categoría"
-            value={categoryName}
-            onChange={(e) => setCategoryName(e.target.value)}
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
             required
           />
           <button type="submit">Agregar</button>
@@ -34,11 +34,11 @@ export default function Categoria() {
         <table>
           <thead>
             <tr>
-              <th>Nombre de la categoría</th>
+              <th>Nombre</th>
             </tr>
           </thead>
           <tbody>
-            {categories.map((category, index) => (
+            {lstCategorias.map((category, index) => (
               <tr key={index}>
                 <td>{category}</td>
               </tr>
