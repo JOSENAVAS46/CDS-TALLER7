@@ -14,36 +14,38 @@ export default function Categoria() {
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
-      <h2>Gestión de Categorías</h2>
+    <main>
+      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
+        <h2>Gestión de Categorías</h2>
 
-      <h3>Nueva Categoría</h3>
-      <form onSubmit={agregarCategoria}>
-        <input
-          type="text"
-          placeholder="Nombre de la categoría"
-          value={categoryName}
-          onChange={(e) => setCategoryName(e.target.value)}
-          required
-        />
-        <button type="submit">Agregar</button>
-      </form>
+        <h3>Nueva Categoría</h3>
+        <form onSubmit={agregarCategoria}>
+          <input
+            type="text"
+            placeholder="Nombre de la categoría"
+            value={categoryName}
+            onChange={(e) => setCategoryName(e.target.value)}
+            required
+          />
+          <button type="submit">Agregar</button>
+        </form>
 
-      <h3>Categorías existentes</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Nombre de la categoría</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categories.map((category, index) => (
-            <tr key={index}>
-              <td>{category}</td>
+        <h3>Categorías existentes</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre de la categoría</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {categories.map((category, index) => (
+              <tr key={index}>
+                <td>{category}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </main>
   );
 }

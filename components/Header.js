@@ -2,7 +2,7 @@ import style from '../styles/header.module.css';
 
 export default function Header() {
     return (
-        <div>
+        <>
             <nav className={style.navbar}>
                 <a className={style.navbar_brand} href="/#">Inicio</a>
                 <a className={style.navbar_brand} href="/categoria">Categoria</a>
@@ -11,6 +11,6 @@ export default function Header() {
                 <a className={style.navbar_brand} href="/compra">Compra</a>
                 <a className={style.navbar_brand} href="/inventario">Inventario</a>
             </nav>
-        </div>
+        </>
     );
 }

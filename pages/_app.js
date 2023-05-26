@@ -8,7 +8,8 @@ export default function App({ Component, pageProps }) {
     return Component.getLayout(<Component {...pageProps} />)
   }
   return <>
-  <Header />
+    <Header />
     <Component {...pageProps} />
-    <Footer /></>
+    <Footer />
+  </>
 }
