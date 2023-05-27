@@ -1,36 +1,110 @@
 import { useState } from 'react';
 
 const Ventas = () => {
-  const [producto, setProducto] = useState('');
+  const [nombreCliente, setNombreCliente] = useState('');
+  const [cedulaCliente, setCedulaCliente] = useState('');
+  const [Cliente, setCliente] = useState([]);
+  const [idProducto, setIdProducto] = useState('');
   const [cantidad, setCantidad] = useState('');
+  const [lstProductos, setLstProductos] = useState([]);
+  const [precioTotal, setPrecioTotal] = useState('');
 
-  const handleProductoChange = (event) => {
-    setProducto(event.target.value);
-  };
-
-  const handleCantidadChange = (event) => {
-    setCantidad(event.target.value);
-  };
-
-  const handleVentaSubmit = (event) => {
+  function agregarVenta(event) {
     event.preventDefault();
-    // Lógica para registrar la venta y actualizar el stock
+
+    if (producto.trim() !== '' && cantidad.trim() !== '') {
+      setProducto([...producto, { producto, cantidad }]);
+      setProducto('');
+      setCantidad('');
+    }
+
   };
 
   return (
     <main>
-      <h2>Registro de ventas</h2>
-      <form onSubmit={handleVentaSubmit}>
-        <label>
-          Producto:
-          <input type="text" value={producto} onChange={handleProductoChange} />
-        </label>
-        <label>
-          Cantidad:
-          <input type="number" value={cantidad} onChange={handleCantidadChange} />
-        </label>
-        <button type="submit">Registrar venta</button>
-      </form>
+      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
+        <h2>Venta</h2>
+        <form onSubmit={agregarVenta}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <label htmlFor="nombreCliente">Cliente:
+              <input
+                type="text"
+                placeholder="Nombre & Apellido del Cliente"
+                value={nombreCliente}
+                onChange={(e) => setNombreCliente(e.target.value)}
+                required
+              />
+            </label>
+            <label htmlFor="cedulaCliente">Cedula:
+              <input
+                type="text"
+                placeholder="Cedula del Cliente"
+                value={cedulaCliente}
+                onChange={(e) => setCedulaCliente(e.target.value)}
+                required
+              />
+            </label>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <label htmlFor="producto">Producto:
+              <input
+                type="text"
+                placeholder="ID del Producto"
+                value={idProducto}
+                onChange={(e) => setIdProducto(e.target.value)}
+                required
+              />
+            </label>
+            <button type="button">Buscar</button>
+          </div>
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Codigo</th>
+                  <th>Producto</th>
+                </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>Arroz | Conejo | 1Lb</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <label htmlFor="cantidad">Cantidad:
+              <input
+                type="text"
+                placeholder="Cantidad del Producto"
+                value={cantidad}
+                onChange={(e) => setCantidad(e.target.value)}
+                required
+              />
+            </label>
+            <button type="button">Añadir</button>
+          </div>
+          <h3>Productos</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Categoria</th>
+                <th>Peso</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+          </table>
+
+          <button type="submit">Vender</button>
+        </form>
+
+      </div>
     </main>
   );
 };

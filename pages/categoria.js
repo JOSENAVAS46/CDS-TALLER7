@@ -16,17 +16,17 @@ export default function Categoria() {
   return (
     <main>
       <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
-        <h2>Gestión de Categorías</h2>
-
-        <h3>Nueva Categoría</h3>
+        <h2>Registrar Categoría</h2>
         <form onSubmit={agregarCategoria}>
-          <input
-            type="text"
-            placeholder="Nombre de la categoría"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            required
-          />
+          <label htmlFor="nombre">Nombre:
+            <input
+              type="text"
+              placeholder="Nombre de la categoría"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              required
+            />
+          </label>
           <button type="submit">Agregar</button>
         </form>
 
