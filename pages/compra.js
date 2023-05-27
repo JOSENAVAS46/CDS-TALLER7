@@ -1,36 +1,116 @@
 import { useState } from 'react';
 
 const Compras = () => {
-  const [producto, setProducto] = useState('');
+  const [nombreProveedor, setNombreProveedor] = useState('');
+  const [cedulaProveedor, setCedulaProveedor] = useState('');
+  const [proveedor, setProveedor] = useState([]);
+  const [idProducto, setIdProducto] = useState('');
   const [cantidad, setCantidad] = useState('');
+  const [lstProductos, setLstProductos] = useState([]);
+  const [precioTotal, setPrecioTotal] = useState('');
 
-  const handleProductoChange = (event) => {
-    setProducto(event.target.value);
-  };
-
-  const handleCantidadChange = (event) => {
-    setCantidad(event.target.value);
-  };
-
-  const handleCompraSubmit = (event) => {
+  function agregarCompra(event) {
     event.preventDefault();
-    // Lógica para registrar la compra y actualizar el stock
-  };
+
+    if (idProducto.trim() !== '' && cantidad.trim() !== '') {
+      setLstProductos([...lstProductos, { idProducto, cantidad }]);
+      setIdProducto('');
+      setCantidad('');
+    }
+  }
 
   return (
     <main>
-      <h2>Registro de compras</h2>
-      <form onSubmit={handleCompraSubmit}>
-        <label>
-          Producto:
-          <input type="text" value={producto} onChange={handleProductoChange} />
-        </label>
-        <label>
-          Cantidad:
-          <input type="number" value={cantidad} onChange={handleCantidadChange} />
-        </label>
-        <button type="submit">Registrar compra</button>
-      </form>
+      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
+        <h2>Compra</h2>
+        <form onSubmit={agregarCompra}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <label htmlFor="nombreProveedor">Proveedor:
+              <input
+                type="text"
+                placeholder="Nombre & Apellido del Proveedor"
+                value={nombreProveedor}
+                onChange={(e) => setNombreProveedor(e.target.value)}
+                required
+              />
+            </label>
+            <label htmlFor="cedulaProveedor">Cedula:
+              <input
+                type="text"
+                placeholder="Cedula del Proveedor"
+                value={cedulaProveedor}
+                onChange={(e) => setCedulaProveedor(e.target.value)}
+                required
+              />
+            </label>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <label htmlFor="producto">Producto:
+              <input
+                type="text"
+                placeholder="ID del Producto"
+                value={idProducto}
+                onChange={(e) => setIdProducto(e.target.value)}
+                required
+              />
+            </label>
+            <button type="button">Buscar</button>
+          </div>
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Codigo</th>
+                  <th>Producto</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Producto 1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <label htmlFor="cantidad">Cantidad:
+              <input
+                type="text"
+                placeholder="Cantidad del Producto"
+                value={cantidad}
+                onChange={(e) => setCantidad(e.target.value)}
+                required
+              />
+            </label>
+            <button type="button">Añadir</button>
+          </div>
+          <h3>Productos</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Categoria</th>
+                <th>Peso</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lstProductos.map((producto, index) => (
+                <tr key={index}>
+                  <td>{producto.idProducto}</td>
+                  <td>Categoría del producto</td>
+                  <td>Peso del producto</td>
+                  <td>Precio del producto</td>
+                  <td>{producto.cantidad}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <button type="submit">Comprar</button>
+        </form>
+      </div>
     </main>
   );
 };
