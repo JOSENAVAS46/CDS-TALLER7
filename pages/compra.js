@@ -2,18 +2,18 @@ import { useState } from 'react';
 
 const Compras = () => {
   const [nombreProveedor, setNombreProveedor] = useState('');
-  const [cedulaProveedor, setCedulaProveedor] = useState('');
+  const [codigoProveedor, setCodigoProveedor] = useState('');
   const [proveedor, setProveedor] = useState([]);
   const [idProducto, setIdProducto] = useState('');
   const [cantidad, setCantidad] = useState('');
-  const [lstProductos, setLstProductos] = useState([]);
+  const [lstProductosCant, setLstProductosCant] = useState([]);
   const [precioTotal, setPrecioTotal] = useState('');
 
   function agregarCompra(event) {
     event.preventDefault();
 
     if (idProducto.trim() !== '' && cantidad.trim() !== '') {
-      setLstProductos([...lstProductos, { idProducto, cantidad }]);
+      setLstProductosCant([...lstProductos, { idProducto, cantidad }]);
       setIdProducto('');
       setCantidad('');
     }
@@ -34,12 +34,12 @@ const Compras = () => {
                 required
               />
             </label>
-            <label htmlFor="cedulaProveedor">Cedula:
+            <label htmlFor="codigoProveedor">Codigo:
               <input
                 type="text"
-                placeholder="Cedula del Proveedor"
-                value={cedulaProveedor}
-                onChange={(e) => setCedulaProveedor(e.target.value)}
+                placeholder="Codigo del Proveedor"
+                value={codigoProveedor}
+                onChange={(e) => setCodigoProveedor(e.target.value)}
                 required
               />
             </label>
@@ -96,7 +96,7 @@ const Compras = () => {
               </tr>
             </thead>
             <tbody>
-              {lstProductos.map((producto, index) => (
+              {lstProductosCant.map((producto, index) => (
                 <tr key={index}>
                   <td>{producto.idProducto}</td>
                   <td>Categoría del producto</td>

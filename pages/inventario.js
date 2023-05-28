@@ -58,6 +58,7 @@ const ListadosInventario = () => {
   return (
     <main>
       <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
+      <h2>Inventario por:</h2>
         <select id="opciones" value={opcionSeleccionada} onChange={handleOpcionSeleccionada}>
           <option value="categorias">Categorías</option>
           <option value="productos">Productos</option>

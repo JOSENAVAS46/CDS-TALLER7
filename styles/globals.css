@@ -9,7 +9,7 @@ main{
 
 .container {
   margin-top: 50px;
-  width: 600px;
+  width: auto;
   margin: 0 auto;
   padding: 20px;
   color: #c9d1d9;
