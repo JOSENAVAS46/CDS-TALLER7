@@ -17,7 +17,7 @@ export default function Producto() {
 
   const obtenerCategorias = async () => {
     try {
-      const response = await fetch('https://api.johnfdz.me/categoria');
+      const response = await fetch('/api/categorias');
       const data = await response.json();
       setLstCategorias(data);
     } catch (error) {

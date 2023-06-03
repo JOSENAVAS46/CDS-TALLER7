@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 export default function Categoria() {
   const [nombre, setNombre] = useState('');
@@ -11,17 +12,15 @@ export default function Categoria() {
 
   const obtenerCategorias = async () => {
     try {
-      const response = await fetch('https://api.johnfdz.me/categoria');
-      const data = await response.json();
-      setLstCategorias(data);
+      const response = await axios.get('/api/categorias');
+      setLstCategorias(response.data);
     } catch (error) {
-      console.log('Error al obtener las categorías:', error);
+      console.error(error);
     }
   };
 
-  const agregarCategoria = async (event) => {
-    event.preventDefault();
 
+  const agregarCategoria = async () => {
     if (nombre.trim() !== '' && percha.trim() !== '') {
       // Validar que "percha" sea un número
       if (isNaN(percha)) {
@@ -29,31 +28,25 @@ export default function Categoria() {
         return;
       }
 
-      const nuevaCategoria = {
-        nombre: nombre,
-        percha: parseInt(percha) // Convertir a número entero
-      };
-
       try {
-        const response = await fetch('https://api.johnfdz.me/categoria', {
-          method: 'POST',
-          body: JSON.stringify(nuevaCategoria)
-        });
+        const nuevaCategoria = {
+          nombre: nombre,
+          percha: parseInt(percha)
+        };
 
-        if (response.ok) {
-          obtenerCategorias();
-        } else {
-          console.log('Error al crear la categoría');
-        }
+        const response = await axios.post('/api/categorias', nuevaCategoria);
+        console.log(response.data);
+        obtenerCategorias();
       } catch (error) {
-        console.log('Error al crear la categoría:', error);
+        console.error(error);
       }
-
       // Limpiar los campos después de agregar la categoría
       setNombre('');
       setPercha('');
     }
   };
+
+
 
   return (
     <main>
