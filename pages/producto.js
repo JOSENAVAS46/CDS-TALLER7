@@ -1,18 +1,31 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function Producto() {
   const [nombre, setNombre] = useState('');
-  const [categoria, setCategoria] = useState('');
+  const [selectedCategoria, setSelectedCategoria] = useState(0);
   const [marca, setMarca] = useState('');
   const [peso, setPeso] = useState('');
-  const [precioCompra, setPrecioCompra] = useState('');
-  const [precioVenta, setPrecioVenta] = useState('');
-  const [producto, setProducto] = useState([]);
+  const [precioCompra, setPrecioCompra] = useState(0);
+  const [precioVenta, setPrecioVenta] = useState(0);
+  const [stock, setStock] = useState(0);
   const [lstProductos, setLstProductos] = useState([]);
   const [lstCategorias, setLstCategorias] = useState([]);
 
+  const validarDecimal = (valor) => {
+    const regex = /^\d*\.?\d{0,2}$/; // Expresión regular para validar decimales con máximo dos dígitos después del punto
+    return regex.test(valor);
+  };
+
+
+  const formatearDecimal = (valor) => {
+    const valorFormateado = valor.replace(',', '.');
+    return valorFormateado;
+  };
+
   useEffect(() => {
     obtenerCategorias();
+    obtenerProductos();
   }, []);
 
   const obtenerCategorias = async () => {
@@ -25,20 +38,83 @@ export default function Producto() {
     }
   };
 
-  const agregarProducto = (event) => {
-    event.preventDefault();
+  const handleCategoriaChange = (event) => {
+    const selectedIndex = event.target.selectedIndex;
+    const selectedOption = lstCategorias[selectedIndex - 1];
+    setSelectedCategoria(selectedOption.id);
+  };
 
-    if (nombre.trim() !== '' && categoria.trim() !== '' && marca.trim() !== '' && peso.trim() !== '' && precioCompra.trim() !== '' && precioVenta.trim() !== '') {
-      setProducto([...producto, { nombre, categoria, marca, peso, precioCompra, precioVenta }]);
-      setLstProductos([...lstProductos, producto]);
+  const handlePrecioCompraChange = (event) => {
+    const valor = event.target.value;
+    if (valor === '' || validarDecimal(valor)) {
+      setPrecioCompra(valor);
+    }
+  };
+
+  const handlePrecioVentaChange = (event) => {
+    const valor = event.target.value;
+    if (valor === '' || validarDecimal(valor)) {
+      setPrecioVenta(valor);
+    }
+  };
+
+  const obtenerProductos = async () => {
+    try {
+      const response = await fetch('/api/productos');
+      const data = await response.json();
+      setLstProductos(data);
+    } catch (error) {
+      console.log('Error al obtener las categorías:', error);
+    }
+  }
+
+  const agregarProducto = async () => {
+    if (
+      nombre.trim() !== '' &&
+      marca.trim() !== '' &&
+      peso.trim() !== '' &&
+      precioCompra !== 0 &&
+      precioVenta !== 0 &&
+      stock !== 0
+    ) {
+      // Validar que los campos de precio compra y precio venta contengan decimales válidos
+      if (!validarDecimal(precioCompra) || !validarDecimal(precioVenta)) {
+        alert('Los campos de precio deben ser decimales válidos (uso de punto(.) y máximo dos dígitos después del punto)');
+      }
+
+      // Formatear los campos de precio compra y precio venta
+      const precioCompraFormateado = parseFloat(formatearDecimal(precioCompra));
+      const precioVentaFormateado = parseFloat(formatearDecimal(precioVenta));
+
+      const nuevoProducto = {
+        nombre: nombre,
+        categoria: parseInt(selectedCategoria),
+        marca: marca,
+        peso: peso,
+        precio_compra: precioCompraFormateado,
+        precio_venta: precioVentaFormateado,
+        stock: stock
+      };
+      try {
+        const response = await axios.post('/api/productos', nuevoProducto);
+        console.log(response.data);
+        obtenerProductos();
+      } catch (error) {
+        console.error(error);
+      }
       setNombre('');
-      setCategoria('');
+      setSelectedCategoria(0);
       setMarca('');
       setPeso('');
       setPrecioCompra('');
       setPrecioVenta('');
+      setStock(0);
+    } else {
+      alert('Todos los campos son requeridos');
     }
   };
+
+
 
   return (
     <main>
@@ -62,14 +138,14 @@ export default function Producto() {
                 Categoría:
                 <select
                   id="opciones"
-                  value={categoria}
-                  onChange={(e) => setCategoria(e.target.value)}
+                  value={selectedCategoria}
+                  onChange={handleCategoriaChange}
                   required
                 >
-                  <option value="">Seleccionar categoría</option>
+                  <option value="Seleccionar categoría">Seleccionar categoría</option>
                   {lstCategorias.map((cat) => (
-                    <option key={cat.id} value={cat.nombre}>
-                      {cat.nombre}
+                    <option key={cat.id} value={cat.id}>
+                      {cat.id + ")" + cat.nombre}
                     </option>
                   ))}
                 </select>
@@ -98,7 +174,7 @@ export default function Producto() {
                 type="text"
                 placeholder="Precio de Compra del Producto"
                 value={precioCompra}
-                onChange={(e) => setPrecioCompra(e.target.value)}
+                onChange={handlePrecioCompraChange}
                 required
               />
             </label>
@@ -107,7 +183,16 @@ export default function Producto() {
                 type="text"
                 placeholder="Precio de Venta del Producto"
                 value={precioVenta}
-                onChange={(e) => setPrecioVenta(e.target.value)}
+                onChange={handlePrecioVentaChange}
+                required
+              />
+            </label>
+            <label htmlFor="stock">Stock:
+              <input
+                type="text"
+                placeholder="Stock del Producto"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
                 required
               />
             </label>
@@ -126,17 +211,19 @@ export default function Producto() {
                 <th>Peso</th>
                 <th>Precio de Compra</th>
                 <th>Precio de Venta</th>
+                <th>Stock</th>
               </tr>
             </thead>
             <tbody>
-              {producto.map((item, index) => (
+              {lstProductos.map((item, index) => (
                 <tr key={index}>
                   <td>{item.nombre}</td>
                   <td>{item.categoria}</td>
                   <td>{item.marca}</td>
                   <td>{item.peso}</td>
-                  <td>{item.precioCompra}</td>
-                  <td>{item.precioVenta}</td>
+                  <td>{item.precio_compra}</td>
+                  <td>{item.precio_venta}</td>
+                  <td>{item.stock}</td>
                 </tr>
               ))}
             </tbody>

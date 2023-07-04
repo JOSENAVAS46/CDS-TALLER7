@@ -5,6 +5,8 @@ export default function Header() {
         <>
             <nav className={style.navbar}>
                 <a className={style.navbar_brand} href="/#">Inicio</a>
+                <a className={style.navbar_brand} href="/cliente">Cliente</a>
+                <a className={style.navbar_brand} href="/proveedor">Proveedor</a>
                 <a className={style.navbar_brand} href="/categoria">Categoria</a>
                 <a className={style.navbar_brand} href="/producto">Producto</a>
                 <a className={style.navbar_brand} href="/venta">Venta</a>

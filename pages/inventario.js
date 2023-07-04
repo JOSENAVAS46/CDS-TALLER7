@@ -1,55 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const InventarioCategorias = () => {
-  // Lógica para obtener el inventario por categorías desde la base de datos o el estado de la aplicación
-  const inventarioCategorias = ['Categoría 1', 'Categoría 2', 'Categoría 3']; // Ejemplo de inventario por categorías
-
-  return (
-    <div>
-      <h2>Listado de inventario por categorías</h2>
-      <ul>
-        {inventarioCategorias.map((categoria, index) => (
-          <li key={index}>{categoria}</li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-const InventarioProductos = () => {
-  // Lógica para obtener el inventario por productos desde la base de datos o el estado de la aplicación
-  const inventarioProductos = ['Producto 1', 'Producto 2', 'Producto 3']; // Ejemplo de inventario por productos
-
-  return (
-    <div>
-      <h2>Listado de inventario por productos</h2>
-      <ul>
-        {inventarioProductos.map((producto, index) => (
-          <li key={index}>{producto}</li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-const InventarioAgotados = () => {
-  // Lógica para obtener los productos agotados o próximos a agotar desde la base de datos o el estado de la aplicación
-  const inventarioAgotados = ['Producto A', 'Producto B', 'Producto C']; // Ejemplo de productos agotados
-
-  return (
-    <div>
-      <h2>Productos agotados o próximos a agotar</h2>
-      <ul>
-        {inventarioAgotados.map((producto, index) => (
-          <li key={index}>{producto}</li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-const ListadosInventario = () => {
+const Inventario = () => {
   const [opcionSeleccionada, setOpcionSeleccionada] = useState('categorias');
+  const [inventarioOriginal, setInventarioOriginal] = useState([]);
+  const [inventarioFiltrado, setInventarioFiltrado] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+
+  useEffect(() => {
+    obtenerCategorias();
+    obtenerInventario();
+  }, [opcionSeleccionada]);
+
+  const obtenerCategorias = async () => {
+    try {
+      const response = await axios.get('/api/categorias');
+      setCategorias(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const obtenerInventario = async () => {
+    try {
+      const response = await axios.get(`/api/inventario/${opcionSeleccionada}`);
+      setInventarioOriginal(response.data);
+      setInventarioFiltrado(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+
+  const obtenerInventarioPorCategoria = (categoria) => {
+    if (categoria === '') {
+      setInventarioFiltrado(inventarioOriginal);
+    } else {
+      const inventarioFiltrado = inventarioOriginal.filter((item) => item.categoria === categoria);
+      setInventarioFiltrado(inventarioFiltrado);
+    }
+  };
 
   const handleOpcionSeleccionada = (event) => {
     setOpcionSeleccionada(event.target.value);
@@ -58,18 +48,109 @@ const ListadosInventario = () => {
   return (
     <main>
       <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
-      <h2>Inventario por:</h2>
+        <h2>Inventario por:</h2>
         <select id="opciones" value={opcionSeleccionada} onChange={handleOpcionSeleccionada}>
           <option value="categorias">Categorías</option>
           <option value="productos">Productos</option>
           <option value="agotados">Agotados</option>
         </select>
-        {opcionSeleccionada === 'categorias' && <InventarioCategorias />}
-        {opcionSeleccionada === 'productos' && <InventarioProductos />}
-        {opcionSeleccionada === 'agotados' && <InventarioAgotados />}
+
+        {opcionSeleccionada === 'categorias' && (
+          <div>
+            <h2>Listado de inventario por categorías</h2>
+            <select onChange={(e) => obtenerInventarioPorCategoria(e.target.value)}>
+              <option value="">Todas las categorías</option>
+              {categorias.map((categoria) => (
+                <option key={categoria.id} value={categoria.nombre}>
+                  {categoria.nombre}
+                </option>
+              ))}
+            </select>
+            <table>
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th>Producto</th>
+                  <th>Marca</th>
+                  <th>Peso</th>
+                  <th>Precio Venta</th>
+                  <th>Stock</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inventarioFiltrado.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.categoria}</td>
+                    <td>{item.producto}</td>
+                    <td>{item.marca}</td>
+                    <td>{item.peso}</td>
+                    <td>{item.precio_venta}</td>
+                    <td>{item.stock}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {opcionSeleccionada === 'productos' && (
+          <div>
+            <h2>Listado de inventario por productos</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Marca</th>
+                  <th>Peso</th>
+                  <th>Precio Venta</th>
+                  <th>Stock</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inventarioFiltrado.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.producto}</td>
+                    <td>{item.marca}</td>
+                    <td>{item.peso}</td>
+                    <td>{item.precio_venta}</td>
+                    <td>{item.stock}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {opcionSeleccionada === 'agotados' && (
+          <div>
+            <h2>Listado de productos agotados o próximos a agotar</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Marca</th>
+                  <th>Peso</th>
+                  <th>Precio Venta</th>
+                  <th>Stock</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inventarioFiltrado.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.producto}</td>
+                    <td>{item.marca}</td>
+                    <td>{item.peso}</td>
+                    <td>{item.precio_venta}</td>
+                    <td>{item.stock}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </main>
   );
 };
 
-export default ListadosInventario;
+export default Inventario;
