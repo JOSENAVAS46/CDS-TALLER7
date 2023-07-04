@@ -13,11 +13,11 @@ export default async function handler(req, res) {
         }
     } else if (req.method === 'PUT') {
         try {
-            const { stock } = req.body;
+            const { idProducto , stock } = req.body;
 
             // Actualizar el stock del producto en la base de datos utilizando el procedimiento almacenado
             const sql = 'CALL sp_ProductoCRUD(?, ?, ?, ?, ?, ?, ?, ?, ?)';
-            const values = ['S', idProducto, null, null, null, null, null, stock, null];
+            const values = ['S', idProducto, null, null, null, null, null, null , stock];
 
             await db.query(sql, values);
 

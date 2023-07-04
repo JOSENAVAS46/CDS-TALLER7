@@ -106,14 +106,22 @@ const Ventas = () => {
 
     try {
       // Agregar la factura
-      const facturaResponse = await axios.post('/api/facturas', {
-        idCliente: lstClientes[0].id,
-        precioTotal: precioTotal,
-        idFactura: null // Esto es para el parámetro out del SP
+    
+      const facturaResponse = await fetch('/api/facturas', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            idCliente: cliente[0].idCliente,
+            precioTotal: precioTotal,
+            idFactura: null // Esto es para el parámetro out del SP
+          })        
       });
 
-      const facturaId = facturaResponse.data.id;
-
+      const response = await facturaResponse.json();
+      const facturaId = response.id;
+      console.log('Factura ID:', facturaId);
       // Agregar los items de la factura
       await Promise.all(
         detalleFactura.map(async (item) => {
@@ -126,9 +134,12 @@ const Ventas = () => {
           });
 
           // Restar la cantidad vendida del stock del producto
+          
           await axios.put(`/api/productos/${producto.id}`, {
+            idProducto: producto.id,
             stock: producto.stock - cantidad
           });
+          
         })
       );
 
@@ -142,7 +153,7 @@ const Ventas = () => {
 
   const limpiarFormulario = () => {
     setCedulaCliente('');
-    setLstClientes([]);
+    setCliente([]);
     setLstProductos([]);
     setIdProducto('');
     setCantidadProducto('');

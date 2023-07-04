@@ -55,11 +55,6 @@ const Compras = () => {
         return;
       }
 
-      if (cantidad > productoEncontrado.stock) {
-        alert('La cantidad ingresada supera el stock disponible');
-        return;
-      }
-
       const existingItem = detalleFactura.find(item => item.producto.id === productoEncontrado.id);
       if (existingItem) {
         const updatedDetalleFactura = detalleFactura.map(item => {
@@ -202,7 +197,7 @@ const Compras = () => {
                   <td>{item.producto.nombre}</td>
                   <td>{item.producto.categoria}</td>
                   <td>{item.producto.peso}</td>
-                  <td>{item.producto.precio_venta}</td>
+                  <td>{item.producto.precio_compra}</td>
                   <td>{item.cantidad}</td>
                   <td>{item.producto.stock}</td>
                   <td><button type="button" onClick={() => eliminarItem(index)}>Eliminar</button></td>
