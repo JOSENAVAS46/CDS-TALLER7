@@ -2,13 +2,14 @@ import { useState } from 'react';
 import axios from 'axios';
 
 const Compras = () => {
-  const [codigoProveedor, setCodigoProveedor] = useState('');
   const [proveedor, setProveedor] = useState([]);
   const [lstProductos, setLstProductos] = useState([]);
   const [idProducto, setIdProducto] = useState('');
   const [cantidadProducto, setCantidadProducto] = useState('');
-  const [detalleFactura, setDetalleFactura] = useState([]);
+  const [detalleCompra, setDetalleCompra] = useState([]);
   const [precioTotal, setPrecioTotal] = useState('');
+  const [codigoProveedor, setCodigoProveedor] = useState('');
+
 
   const buscarProveedor = async () => {
     if (codigoProveedor.trim() === '') {
@@ -18,10 +19,10 @@ const Compras = () => {
     try {
       const response = await axios.get(`/api/proveedores/${codigoProveedor}`);
       const proveedorResp = response.data;
-      if (proveedorResp.length > 0) {
+      if (proveedorResp) {
         setProveedor(proveedorResp);
       } else {
-        setProveedor([]); // Limpiar el proveedor si no se encontró ninguno
+        setProveedor(null); // Limpiar el proveedor si no se encontró ninguno
         alert('No se encontró ningún proveedor con ese código');
       }
     } catch (error) {
@@ -55,22 +56,18 @@ const Compras = () => {
         return;
       }
 
-      const existingItem = detalleFactura.find(item => item.producto.id === productoEncontrado.id);
-      if (existingItem) {
-        const updatedDetalleFactura = detalleFactura.map(item => {
-          if (item.producto.id === productoEncontrado.id) {
-            return { ...item, cantidad: item.cantidad + cantidad };
-          }
-          return item;
-        });
-        setDetalleFactura(updatedDetalleFactura);
+      const existingItemIndex = detalleCompra.findIndex(item => item.producto.id === productoEncontrado.id);
+      if (existingItemIndex !== -1) {
+        const updatedDetalleCompra = [...detalleCompra];
+        updatedDetalleCompra[existingItemIndex].cantidad += cantidad;
+        setDetalleCompra(updatedDetalleCompra);
       } else {
         const newItem = {
           producto: productoEncontrado,
           cantidad: cantidad,
-          precioUnitario: productoEncontrado.precio_venta,
+          precioCompra: productoEncontrado.precio_compra,
         };
-        setDetalleFactura([...detalleFactura, newItem]);
+        setDetalleCompra([...detalleCompra, newItem]);
       }
 
       setIdProducto('');
@@ -79,30 +76,83 @@ const Compras = () => {
   };
 
   const eliminarItem = (index) => {
-    const updatedDetalleFactura = [...detalleFactura];
-    updatedDetalleFactura.splice(index, 1);
-    setDetalleFactura(updatedDetalleFactura);
+    const updatedDetalleCompra = [...detalleCompra];
+    updatedDetalleCompra.splice(index, 1);
+    setDetalleCompra(updatedDetalleCompra);
   };
+
+
+  const calcularPrecioTotal = () => {
+    const total = detalleCompra.reduce((acc, item) => {
+      return acc + item.cantidad * item.precioCompra;
+    }, 0);
+    setPrecioTotal(total);
+  };
+  
 
   const agregarCompra = async (e) => {
     e.preventDefault();
-    if (detalleFactura.length === 0) {
-      alert('Debe agregar al menos un producto');
+
+    if (detalleCompra.length === 0) {
+      alert('Agregue al menos un producto a la compra');
       return;
     }
+
     try {
-      const response = await axios.post('/api/compras', {
-        proveedor: proveedor,
-        detalleFactura: detalleFactura,
+      // Agregar la compra
+
+      const compraResponse = await fetch('/api/compras', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          idProveedor: proveedor[0].id,
+          precioTotal: precioTotal,
+          idCompra: null // Esto es para el parámetro out del SP
+        })
       });
-      alert(response.data.message);
-      setCodigoProveedor('');
-      setProveedor({});
-      setDetalleFactura([]);
+
+      const response = await compraResponse.json();
+      const compraId = response.id;
+
+      // Agregar los items de la compra
+      await Promise.all(
+        detalleCompra.map(async (item) => {
+          const { producto, cantidad, precioCompra } = item;
+          await axios.post('/api/detalle_compra', {
+            idCompra: compraId,
+            idProducto: producto.id,
+            cantidad: cantidad,
+            precioCompra: precioCompra
+          });
+
+          // Incrementar la cantidad comprada en el stock del producto
+          await axios.put(`/api/productos/${producto.id}`, {
+            idProducto: producto.id,
+            stock: producto.stock + cantidad
+          });
+        })
+      );
+
+      alert('La compra se agregó exitosamente');
+      limpiarFormulario();
     } catch (error) {
       console.log('Error al agregar la compra:', error);
+      alert('Ocurrió un error al agregar la compra');
     }
   };
+
+  const limpiarFormulario = () => {
+    setCodigoProveedor('');
+    setProveedor([]);
+    setLstProductos([]);
+    setIdProducto('');
+    setCantidadProducto('');
+    setDetalleCompra([]);
+    setPrecioTotal('');
+  };
+
 
   return (
     <main>
@@ -121,7 +171,6 @@ const Compras = () => {
                 required
               />
             </label>
-
             <label htmlFor="proveedor.nombre">
               Proveedor:
               <input
@@ -186,26 +235,30 @@ const Compras = () => {
                 <th>Producto</th>
                 <th>Categoria</th>
                 <th>Peso</th>
-                <th>Precio</th>
-                <th>Cantidad</th>
                 <th>Stock</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
               </tr>
             </thead>
             <tbody>
-              {detalleFactura.map((item, index) => (
+              {detalleCompra.map((item, index) => (
                 <tr key={index}>
                   <td>{item.producto.nombre}</td>
                   <td>{item.producto.categoria}</td>
                   <td>{item.producto.peso}</td>
-                  <td>{item.producto.precio_compra}</td>
-                  <td>{item.cantidad}</td>
                   <td>{item.producto.stock}</td>
+                  <td>{item.cantidad}</td>
+                  <td>{item.producto.precio_compra}</td>
                   <td><button type="button" onClick={() => eliminarItem(index)}>Eliminar</button></td>
                 </tr>
               ))}
+              <tr>
+                <td colSpan="5">Precio Total:</td>
+                <td>{"$     " + precioTotal}</td>
+                <td><button type="button" onClick={() => calcularPrecioTotal()}>Calcular</button></td>
+              </tr>
             </tbody>
           </table>
-
           <button type="submit">Comprar</button>
         </form>
       </div>

@@ -74,7 +74,7 @@ const Ventas = () => {
         const newItem = {
           producto: productoEncontrado,
           cantidad: cantidad,
-          precioUnitario: productoEncontrado.precio_venta,
+          precioVenta: productoEncontrado.precio_venta,
         };
         setDetalleFactura([...detalleFactura, newItem]);
       }
@@ -91,7 +91,7 @@ const Ventas = () => {
 
   const calcularPrecioTotal = () => {
     const total = detalleFactura.reduce((acc, item) => {
-      return acc + item.cantidad * item.precioUnitario;
+      return acc + item.cantidad * item.precioVenta;
     }, 0);
     setPrecioTotal(total);
   };
@@ -125,12 +125,12 @@ const Ventas = () => {
       // Agregar los items de la factura
       await Promise.all(
         detalleFactura.map(async (item) => {
-          const { producto, cantidad, precioUnitario } = item;
+          const { producto, cantidad, precioVenta } = item;
           await axios.post('/api/detalle_factura', {
             idFactura: facturaId,
             idProducto: producto.id,
             cantidad: cantidad,
-            precioUnitario: precioUnitario
+            precioVenta: precioVenta
           });
 
           // Restar la cantidad vendida del stock del producto

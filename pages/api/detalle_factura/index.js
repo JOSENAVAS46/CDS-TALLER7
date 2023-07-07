@@ -3,11 +3,11 @@ import db from '../../../config/db';
 const agregarItemVenta = async (req, res) => {
     if (req.method === 'POST') {
         try {
-            const { idFactura, idProducto, cantidad , precioUnitario} = req.body;
+            const { idFactura, idProducto, cantidad , precioVenta} = req.body;
             console.log("ID PRODUCTO", idProducto);
             // Insertar nuevo detalle de factura en la base de datos utilizando el procedimiento almacenado
             const sql = 'CALL sp_DetalleFacturaCRUD(?, ?, ?, ?, ?, ?, ?)';
-            const values = ['C', null, idFactura, idProducto, cantidad, precioUnitario, 'A'];
+            const values = ['C', null, idFactura, idProducto, cantidad, precioVenta, 'A'];
 
             await db.query(sql, values);
 
