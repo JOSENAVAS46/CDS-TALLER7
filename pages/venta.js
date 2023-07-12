@@ -8,7 +8,7 @@ const Ventas = () => {
   const [idProducto, setIdProducto] = useState('');
   const [cantidadProducto, setCantidadProducto] = useState('');
   const [detalleFactura, setDetalleFactura] = useState([]);
-  const [precioTotal, setPrecioTotal] = useState('');
+  const [precioTotal, setPrecioTotal] = useState(0);
 
   const buscarCliente = async () => {
     if (cedulaCliente.trim() === '') {
@@ -74,7 +74,7 @@ const Ventas = () => {
         const newItem = {
           producto: productoEncontrado,
           cantidad: cantidad,
-          precioVenta: productoEncontrado.precio_venta,
+          precioVenta: parseFloat(productoEncontrado.precio_venta),
         };
         setDetalleFactura([...detalleFactura, newItem]);
       }

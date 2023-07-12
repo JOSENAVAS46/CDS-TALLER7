@@ -7,7 +7,7 @@ const Compras = () => {
   const [idProducto, setIdProducto] = useState('');
   const [cantidadProducto, setCantidadProducto] = useState('');
   const [detalleCompra, setDetalleCompra] = useState([]);
-  const [precioTotal, setPrecioTotal] = useState('');
+  const [precioTotal, setPrecioTotal] = useState(0);
   const [codigoProveedor, setCodigoProveedor] = useState('');
 
 
@@ -65,7 +65,7 @@ const Compras = () => {
         const newItem = {
           producto: productoEncontrado,
           cantidad: cantidad,
-          precioCompra: productoEncontrado.precio_compra,
+          precioCompra: parseFloat(productoEncontrado.precio_compra),
         };
         setDetalleCompra([...detalleCompra, newItem]);
       }
